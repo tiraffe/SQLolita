@@ -1,0 +1,165 @@
+start
+   : command ';'
+
+command
+   : ddl
+   | dml
+   | utility
+   | nothing
+
+ddl
+   : createtable
+   | createindex
+   | droptable
+   | dropindex
+   | showtables
+
+dml
+   : query
+   | insert
+   | delete
+   | update
+
+utility
+   : load
+   | exit
+   | set
+   | help
+   | print
+
+showtables
+   : SHOW TABLES
+
+createtable
+   : CREATE TABLE ID '(' non_mattrtype_list ')'
+
+createindex
+   : CREATE INDEX ID '(' ID ')'
+
+droptable
+   : DROP TABLE ID
+
+dropindex
+   : DROP INDEX ID '(' ID ')'
+
+load
+   : LOAD ID '(' STRING ')'
+
+set
+   : SET ID EQ STRING
+   | SET ID EQ expr
+
+help
+   : HELP oprelname
+
+print
+   : PRINT ID
+
+exit
+   : EXIT
+
+query
+   : SELECT non_mselect_clause FROM non_mrelation_list opwhere_clause
+
+insert
+   : INSERT INTO ID VALUES inservalue_list
+
+inservalue_list
+   : '(' non_mvalue_list ')' ',' inservalue_list
+   | '(' non_mvalue_list ')'
+
+delete
+   : DELETE FROM ID opwhere_clause
+
+update
+   : UPDATE ID SET relattr EQ relattr_or_value opwhere_clause
+
+non_mattrtype_list
+   : attrtype ',' non_mattrtype_list
+   | attrtype
+
+attrtype
+   : ID type
+   | ID type '(' INT ')'
+   | PRIMARY KEY '(' ID ')'
+
+type
+   : INT
+   | CHAR
+
+non_mselect_clause
+   : non_mrelattr_list
+   | '*'
+
+non_mrelattr_list
+   : relattr ',' non_mrelattr_list
+   | relattr
+
+relattr
+   : ID '.' ID
+   | ID
+
+non_mrelation_list
+   : relation ',' non_mrelation_list
+   | relation
+
+relation
+   : ID
+
+opwhere_clause
+   : WHERE non_mcond_list
+   | nothing
+
+non_mcond_list
+   : condition AND non_mcond_list
+   | condition OR  non_mcond_list
+   | condition
+
+condition
+   : relattr op relattr_or_value
+   | relattr IS NULL
+   | relattr IS NOT NULL
+
+relattr_or_value
+   : relattr
+   | value
+
+non_mvalue_list
+   : value ',' non_mvalue_list
+   | value
+   | null_value ',' non_mvalue_list
+   | null_value
+
+value
+   : STRING
+   | NUMBER
+
+null_value
+   : NULL
+
+oprelname
+   : ID
+   | nothing
+
+op
+   : LT
+   | LE
+   | GT
+   | GE
+   | EQ
+   | NE
+
+expr
+	: expr '+' expr
+	| expr '-' expr
+	| expr '*' expr
+	| expr '/' expr
+	| expr AND expr
+	| expr OR  expr
+	| expr op  expr
+	| '(' expr ')'
+	| value
+	| ID
+
+
+--END--
