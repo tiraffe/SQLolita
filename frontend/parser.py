@@ -1,7 +1,9 @@
 # coding=utf-8
 # Created by Tian Yuanhao on 2016/3/25.
+from string import upper
 
 import ply.yacc as yacc
+from nodes import *
 import lexer
 
 # Get the token map.
@@ -35,7 +37,11 @@ def p_ddl(p):
             | createindex
             | droptable
             | dropindex
-            | showtables """
+            | showtables
+            | alerttable
+            | createuser
+            | grantuser
+            | revokeuser """
     pass
 
 
@@ -48,10 +54,7 @@ def p_dml(p):
 
 
 def p_utility(p):
-    """ utility : load
-                | exit
-                | set
-                | help
+    """ utility : exit
                 | print """
     pass
 
@@ -61,40 +64,48 @@ def p_showtables(p):
     pass
 
 
+def p_createuser(p):
+    """ createuser : CREATE USER ID PASSWORD STRING"""
+    pass
+
+
+def p_grantuser(p):
+    """ grantuser : GRANT non_mrelation_list ON non_mrelation_list TO non_mrelation_list """
+    pass
+
+
+def p_revokeuser(p):
+    """ revokeuser : REVOKE non_mrelation_list ON non_mrelation_list FROM non_mrelation_list """
+    pass
+
+
+def p_alerttable(p):
+    """ alerttable : ALERT TABLE ID ADD ID type
+                   | ALERT TABLE ID DROP non_mrelation_list """
+    if upper(p[4]) == 'ADD':
+        p[0] = AlertNode(p[3], 'ADD', (p[5], p[6]))
+    else:
+        p[0] = AlertNode(p[3], 'DROP', p[5])
+
+
 def p_createtable(p):
     """ createtable : CREATE TABLE ID '(' non_mattrtype_list ')' """
-    pass
+    p[0] = CreateTableNode(p[3], p[5])
 
 
 def p_createindex(p):
     """ createindex : CREATE INDEX ID '(' ID ')' """
-    pass
+    p[0] = CreateIndexNode(p[3], p[5])
 
 
 def p_droptable(p):
     """ droptable : DROP TABLE ID """
-    pass
+    p[0] = DropTableNode(p[3])
 
 
 def p_dropindex(p):
     """ dropindex : DROP INDEX ID '(' ID ')' """
-    pass
-
-
-def p_load(p):
-    """ load : LOAD ID '(' STRING ')' """
-    pass
-
-
-def p_set(p):
-    """ set : SET ID EQ STRING
-            | SET ID EQ expr """
-    pass
-
-
-def p_help(p):
-    """ help : HELP oprelname """
-    pass
+    p[0] = DropIndexNode(p[3], p[5])
 
 
 def p_print(p):
@@ -109,28 +120,31 @@ def p_exit(p):
 
 def p_query(p):
     """ query : SELECT non_mselect_clause FROM non_mrelation_list opwhere_clause """
-    pass
+    p[0] = QueryNode(p[2], p[4], p[5])
 
 
 def p_insert(p):
     """ insert : INSERT INTO ID VALUES inservalue_list """
-    pass
+    p[0] = InsertNode(p[3], p[5])
 
 
 def p_inservalue_list(p):
     """ inservalue_list : '(' non_mvalue_list ')' ',' inservalue_list
                         | '(' non_mvalue_list ')' """
-    pass
+    if len(p) > 4:
+        p[0] = [p[2]] + p[5]
+    else:
+        p[0] = [p[2]]
 
 
 def p_delete(p):
     """ delete : DELETE FROM ID opwhere_clause """
-    pass
+    p[0] = DeleteNode(p[3], p[4])
 
 
 def p_update(p):
     """ update : UPDATE ID SET relattr EQ relattr_or_value opwhere_clause """
-    pass
+    p[0] = UpdateNode(p[2], [p[4], p[6]], p[7])
 
 
 def p_non_mattrtype_list(p):
@@ -212,7 +226,10 @@ def p_non_mvalue_list(p):
                         | value
                         | null_value ',' non_mvalue_list
                         | null_value """
-    pass
+    if len(p) == 1:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
 
 
 def p_value(p):
@@ -223,12 +240,6 @@ def p_value(p):
 
 def p_null_value(p):
     """ null_value : NULL """
-    pass
-
-
-def p_oprelname(p):
-    """ oprelname : ID
-                  | nothing """
     pass
 
 
@@ -252,6 +263,7 @@ def p_expr(p):
              | expr op  expr
              | '(' expr ')'
              | value
+             | null_value
              | ID """
     pass
 
@@ -263,7 +275,7 @@ def p_nothing(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    print "Syntax error in input!"
+    print("Syntax error in input!")
 
 
 # Build the parser
@@ -271,11 +283,15 @@ from lexer import lexer as lex
 
 parser = yacc.yacc()
 
-while True:
-    try:
-        s = raw_input('calc > ')
-    except EOFError:
-        break
-    if not s: continue
-    result = parser.parse(s, lexer=lex)
-    print result
+if __name__ == '__main__':
+    while True:
+        try:
+            s = raw_input('Parser > ')
+        except EOFError:
+            break
+        if not s: continue
+        try:
+            result = parser.parse(s, lexer=lex)
+            print result
+        except Exception, e:
+            print(e)

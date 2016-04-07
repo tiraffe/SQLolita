@@ -13,6 +13,10 @@ ddl
    | droptable
    | dropindex
    | showtables
+   | alerttable
+   | createuser
+   | grantuser
+   | revokeuser
 
 dml
    : query
@@ -21,14 +25,24 @@ dml
    | update
 
 utility
-   : load
-   | exit
-   | set
-   | help
+   : exit
    | print
 
 showtables
    : SHOW TABLES
+
+createuser
+	: CREATE USER ID PASSWORD STRING
+	
+grantuser
+	: GRANT non_mrelation_list ON non_mrelation_list TO non_mrelation_list
+
+revokeuser
+	: REVOKE non_mrelation_list ON non_mrelation_list FROM non_mrelation_list
+	
+alerttable
+	: ALERT TABLE ID ADD ID type
+	| ALERT TABLE ID DROP non_mrelation_list
 
 createtable
    : CREATE TABLE ID '(' non_mattrtype_list ')'
@@ -41,16 +55,6 @@ droptable
 
 dropindex
    : DROP INDEX ID '(' ID ')'
-
-load
-   : LOAD ID '(' STRING ')'
-
-set
-   : SET ID EQ STRING
-   | SET ID EQ expr
-
-help
-   : HELP oprelname
 
 print
    : PRINT ID
@@ -137,10 +141,6 @@ value
 null_value
    : NULL
 
-oprelname
-   : ID
-   | nothing
-
 op
    : LT
    | LE
@@ -159,6 +159,7 @@ expr
 	| expr op  expr
 	| '(' expr ')'
 	| value
+	| null_value
 	| ID
 
 

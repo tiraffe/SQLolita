@@ -9,7 +9,8 @@ reversed = (
     # Main
     'CREATE', 'TABLE', 'DROP', 'SHOW', 'ALTER', 'SELECT', 'FROM', 'WHERE',
     'INSERT', 'DELETE', 'UPDATE', 'VIEW', 'USER', 'REVOKE', 'GRANT',
-    'INDEX', 'LOAD', 'SET', 'INTO', 'VALUES', 'TABLES',
+    'INDEX', 'LOAD', 'SET', 'INTO', 'VALUES', 'TABLES', 'ALERT', 'ADD', "ON", "TO",
+    'PASSWORD',
     # Modifier
     'PRIMARY', 'KEY', 'DESC', 'ASC',
     # Const Value
@@ -75,7 +76,7 @@ def t_error(t):
 lexer = lex.lex()
 
 if __name__ == '__main__':
-    data = raw_input('>> ')
+    data = raw_input('Lexer > ')
     lexer = lex.lex()
     lexer.input(data)
     while True:
