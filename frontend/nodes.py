@@ -1,5 +1,6 @@
 # coding=utf-8
 # Created by Tian Yuanhao on 2016/4/5.
+from string import upper
 
 
 class QueryNode():
@@ -95,3 +96,15 @@ class ShowTables():
         self.table_name = table_name
 
 
+class Value():
+    def __init__(self, value_type, value):
+        self.type = "VALUE"
+        self.value_type = value_type
+        self.value = value
+
+class OpNode():
+    def __init__(self, left, op, right):
+        self.type = "OP"
+        self.op = upper(op)
+        self.left = left
+        self.right = right

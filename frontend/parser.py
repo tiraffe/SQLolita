@@ -13,9 +13,6 @@ precedence = (
     ('left', 'OR'),
     ('left', 'AND'),
     ('nonassoc', 'LE', 'LE', 'GE', 'GT', 'EQ', 'NE'),  # Nonassociative operators
-    ('left', '+', '-'),
-    ('left', '*', '/'),
-    ('right', '-'),  # Unary minus operator
 )
 
 
@@ -110,6 +107,7 @@ def p_dropindex(p):
 
 def p_print(p):
     """ print : PRINT ID """
+
     pass
 
 
@@ -202,9 +200,11 @@ def p_opwhere_clause(p):
 
 
 def p_non_mcond_list(p):
-    """ non_mcond_list : condition AND non_mcond_list
-                       | condition OR  non_mcond_list
+    """ non_mcond_list : non_mcond_list AND non_mcond_list
+                       | non_mcond_list OR  non_mcond_list
+                       | '(' non_mcond_list ')'
                        | condition """
+    if(len(p) == 4): print p[2]
     pass
 
 
@@ -232,15 +232,21 @@ def p_non_mvalue_list(p):
         p[0] = [p[1]] + p[3]
 
 
-def p_value(p):
-    """ value : STRING
-              | NUMBER """
-    pass
+def p_value_string(p):
+    """ value : STRING """
+    p[0] = Value('STRING', p[1])
+    print(p[0])
+
+
+def p_value_number(p):
+    """ value : NUMBER """
+    p[0] = Value('NUMBER', p[1])
+    print(p[0])
 
 
 def p_null_value(p):
     """ null_value : NULL """
-    pass
+    p[0] = Value('NULL', 0)
 
 
 def p_op(p):
@@ -250,22 +256,7 @@ def p_op(p):
            | GE
            | EQ
            | NE """
-    pass
-
-
-def p_expr(p):
-    """ expr : expr '+' expr
-             | expr '-' expr
-             | expr '*' expr
-             | expr '/' expr
-             | expr AND expr
-             | expr OR  expr
-             | expr op  expr
-             | '(' expr ')'
-             | value
-             | null_value
-             | ID """
-    pass
+    p[0] = p[1]
 
 
 def p_nothing(p):
@@ -275,7 +266,7 @@ def p_nothing(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    print("Syntax error in input!")
+    print "Syntax error at token '%s'(%s)" % (p.value, p.type)
 
 
 # Build the parser
