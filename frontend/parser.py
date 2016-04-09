@@ -143,7 +143,7 @@ def p_delete(p):
 
 def p_update(p):
     """ update : UPDATE ID SET relattr EQ relattr_or_value opwhere_clause """
-    p[0] = UpdateNode(p[2], [p[4], p[6]], p[7])
+    p[0] = UpdateNode(p[2], (p[4], p[6]), p[7])
 
 
 def p_non_mattrtype_list(p):
@@ -287,7 +287,10 @@ def p_nothing(p):
 
 # Error rule for syntax errors
 def p_error(p):
-    print "Syntax error at token '%s'(%s)" % (p.value, p.type)
+    if not p:
+        print "Syntax error, missing something (maybe ';')."
+    else:
+        print "Syntax error at token '%s'(%s)" % (p.value, p.type)
 
 
 # Build the parser

@@ -3,7 +3,7 @@
 from string import upper
 
 
-class NodeType():
+class NodeType:
     select = 'SELECT'
     insert = 'INSERT'
     delete = 'DELETE'
@@ -40,7 +40,7 @@ class InsertNode:
         self.value_list = value_list
 
 
-class DeleteNode():
+class DeleteNode:
     def __init__(self, table_name, where_list):
         self.type = NodeType.delete
         self.table_name = table_name
@@ -51,6 +51,7 @@ class UpdateNode:
     def __init__(self, table_name, set_list, where_list):
         self.type = NodeType.update
         self.table_name = table_name
+        self.set_list = set_list
         self.where_list = where_list
 
 
@@ -134,7 +135,7 @@ class Value:
         self.value = value
 
     def __str__(self):
-        return str(self.value) + '['+  self.value_type + ']'
+        return str(self.value) + '[' + self.value_type + ']'
 
 
 class RelAttr:
@@ -158,7 +159,7 @@ class Cond:
         self.right = right
 
     def __str__(self):
-        return '(' + str(self.left) + ', ' + str(self.right)+ ', ' + self.op + ')'
+        return '(' + str(self.left) + ', ' + str(self.right) + ', ' + self.op + ')'
 
 
 class AttrType:
@@ -166,3 +167,4 @@ class AttrType:
         self.type = NodeType.attr_type
         self.attr_type = attr_type
         self.attr_name = attr_name
+
