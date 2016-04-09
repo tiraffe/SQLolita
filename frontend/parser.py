@@ -79,10 +79,10 @@ def p_revokeuser(p):
 
 
 def p_alerttable(p):
-    """ alerttable : ALERT TABLE ID ADD ID type
+    """ alerttable : ALERT TABLE ID ADD attrtype
                    | ALERT TABLE ID DROP non_mrelation_list """
     if upper(p[4]) == 'ADD':
-        p[0] = AlertNode(p[3], 'ADD', (p[5], p[6]))
+        p[0] = AlertNode(p[3], 'ADD', p[5])
     else:
         p[0] = AlertNode(p[3], 'DROP', p[5])
 
@@ -157,7 +157,7 @@ def p_non_mattrtype_list(p):
 
 def p_attrtype(p):
     """ attrtype : ID type
-                 | ID type '(' INT ')'
+                 | ID type '(' NUMBER ')'
                  | PRIMARY KEY '(' ID ')' """
     if len(p) == 3:
         p[0] = AttrType(p[2], p[1])

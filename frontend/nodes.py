@@ -59,7 +59,7 @@ class AlertNode:
         self.type = NodeType.alert
         self.table_name = table_name
         self.op = op
-        self.rel_list = attr_list
+        self.attr_list = attr_list
 
 
 class CreateTableNode:
