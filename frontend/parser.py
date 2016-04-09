@@ -18,7 +18,7 @@ precedence = (
 
 def p_start(p):
     """ start : command ';' """
-    pass
+    p[0] = p[1]
 
 
 def p_command(p):
@@ -26,7 +26,7 @@ def p_command(p):
                 | dml
                 | utility
                 | nothing """
-    pass
+    p[0] = p[1]
 
 
 def p_ddl(p):
@@ -39,7 +39,7 @@ def p_ddl(p):
             | createuser
             | grantuser
             | revokeuser """
-    pass
+    p[0] = p[1]
 
 
 def p_dml(p):
@@ -47,27 +47,29 @@ def p_dml(p):
             | insert
             | delete
             | update """
-    pass
+    p[0] = p[1]
 
 
 def p_utility(p):
     """ utility : exit
                 | print """
-    pass
+    p[0] = p[1]
 
 
 def p_showtables(p):
     """ showtables : SHOW TABLES """
-    pass
+    p[0] = ShowTables(p[2])
 
 
 def p_createuser(p):
     """ createuser : CREATE USER ID PASSWORD STRING"""
-    pass
+    p[0] = CreateUserNode(p[3], p[5])
+    # TODO: create user
 
 
 def p_grantuser(p):
     """ grantuser : GRANT non_mrelation_list ON non_mrelation_list TO non_mrelation_list """
+    # TODO: grant user
     pass
 
 
@@ -107,13 +109,12 @@ def p_dropindex(p):
 
 def p_print(p):
     """ print : PRINT ID """
-
-    pass
+    p[0] = PrintTable(p[2])
 
 
 def p_exit(p):
     """ exit : EXIT """
-    pass
+    p[0] = Exit()
 
 
 def p_query(p):
@@ -148,55 +149,73 @@ def p_update(p):
 def p_non_mattrtype_list(p):
     """ non_mattrtype_list : attrtype ',' non_mattrtype_list
                            | attrtype """
-    pass
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
 
 
 def p_attrtype(p):
     """ attrtype : ID type
                  | ID type '(' INT ')'
                  | PRIMARY KEY '(' ID ')' """
-    pass
+    if len(p) == 3:
+        p[0] = AttrType(p[2], p[1])
+    elif len(p) == 5:
+        p[0] = AttrType((p[2], p[4]), p[1])
+    else:
+        p[0] = AttrType('PK', p[4])
 
 
 def p_type(p):
     """ type : INT
              | CHAR """
-    pass
+    p[0] = upper(p[1])
 
 
 def p_non_mselect_clause(p):
     """ non_mselect_clause : non_mrelattr_list
                            | '*' """
-    pass
+    p[0] = p[1]
 
 
 def p_non_mrelattr_list(p):
     """ non_mrelattr_list : relattr ',' non_mrelattr_list
                           | relattr """
-    pass
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else :
+        p[0] = [p[1]] + p[3]
 
 
 def p_relattr(p):
     """ relattr : ID '.' ID
                 | ID """
-    pass
+    if len(p) == 2:
+        p[0] = RelAttr(p[1])
+    else :
+        p[0] = RelAttr(p[3], p[1])
 
 
 def p_non_mrelation_list(p):
     """ non_mrelation_list : relation ',' non_mrelation_list
                            | relation """
-    pass
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
 
 
 def p_relation(p):
     """ relation : ID """
-    pass
+    p[0] = RelAttr(p[1])
 
 
 def p_opwhere_clause(p):
     """ opwhere_clause : WHERE non_mcond_list
                        | nothing """
-    pass
+    if len(p) == 3:
+        p[0] = p[2]
 
 
 def p_non_mcond_list(p):
@@ -204,21 +223,25 @@ def p_non_mcond_list(p):
                        | non_mcond_list OR  non_mcond_list
                        | '(' non_mcond_list ')'
                        | condition """
-    if(len(p) == 4): print p[2]
-    pass
+    if len(p) == 2:
+        p[0] = p[1]
+    elif p[1] == '(':
+        p[0] = p[2]
+    else:
+        p[0] = Cond(p[1], p[2], p[3])
 
 
 def p_condition(p):
     """ condition : relattr op relattr_or_value
-                  | relattr IS NULL
-                  | relattr IS NOT NULL """
-    pass
+                  | relattr EQ null_value
+                  | relattr NE null_value """
+    p[0] = Cond(p[1], p[2], p[3])
 
 
 def p_relattr_or_value(p):
     """ relattr_or_value : relattr
                          | value """
-    pass
+    p[0] = p[1]
 
 
 def p_non_mvalue_list(p):
@@ -226,7 +249,7 @@ def p_non_mvalue_list(p):
                         | value
                         | null_value ',' non_mvalue_list
                         | null_value """
-    if len(p) == 1:
+    if len(p) == 2:
         p[0] = [p[1]]
     else:
         p[0] = [p[1]] + p[3]
@@ -235,13 +258,11 @@ def p_non_mvalue_list(p):
 def p_value_string(p):
     """ value : STRING """
     p[0] = Value('STRING', p[1])
-    print(p[0])
 
 
 def p_value_number(p):
     """ value : NUMBER """
     p[0] = Value('NUMBER', p[1])
-    print(p[0])
 
 
 def p_null_value(p):
@@ -261,7 +282,7 @@ def p_op(p):
 
 def p_nothing(p):
     """ nothing : """
-    pass
+    p[0] = None
 
 
 # Error rule for syntax errors
