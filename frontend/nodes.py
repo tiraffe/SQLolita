@@ -2,6 +2,7 @@
 # Created by Tian Yuanhao on 2016/4/5.
 from string import upper
 
+
 class NodeType():
     select = 'SELECT'
     insert = 'INSERT'
@@ -24,7 +25,7 @@ class NodeType():
     attr_type = "ATTRTYPE"
 
 
-class QueryNode():
+class QueryNode:
     def __init__(self, select_list, from_list, where_list):
         self.type = NodeType.select
         self.select_list = select_list
@@ -32,7 +33,7 @@ class QueryNode():
         self.where_list = where_list
 
 
-class InsertNode():
+class InsertNode:
     def __init__(self, table_name, value_list):
         self.type = NodeType.insert
         self.table_name = table_name
@@ -46,14 +47,14 @@ class DeleteNode():
         self.where_list = where_list
 
 
-class UpdateNode():
+class UpdateNode:
     def __init__(self, table_name, set_list, where_list):
         self.type = NodeType.update
         self.table_name = table_name
         self.where_list = where_list
 
 
-class AlertNode():
+class AlertNode:
     def __init__(self, table_name, op, attr_list):
         self.type = NodeType.alert
         self.table_name = table_name
@@ -61,77 +62,82 @@ class AlertNode():
         self.rel_list = attr_list
 
 
-class CreateTableNode():
+class CreateTableNode:
     def __init__(self, table_name, attr_list):
         self.type = NodeType.create_table
         self.table_name = table_name
         self.attr_list = attr_list
 
 
-class DropTableNode():
+class DropTableNode:
     def __init__(self, table_name):
         self.type = NodeType.drop_table
         self.table_name = table_name
 
 
-class CreateIndexNode():
+class CreateIndexNode:
     def __init__(self, table_name, attr_name):
         self.type = NodeType.create_index
         self.table_name = table_name
         self.attr_name = attr_name
 
 
-class DropIndexNode():
+class DropIndexNode:
     def __init__(self, table_name, attr_name):
         self.type = NodeType.drop_index
         self.table_name = table_name
         self.attr_name = attr_name
 
 
-class CreateUserNode():
+class CreateUserNode:
     def __init__(self, user_id, password):
         self.type = NodeType.create_user
         self.user_id = user_id
         self.password = password
 
 
-class GrantUserNode():
+class GrantUserNode:
     # TODO this
     def __init__(self):
+        self.type = NodeType.grant_user
         pass
 
 
-class RevokeUserNode():
+class RevokeUserNode:
     # TODO this
     def __init__(self):
+        self.type = NodeType.revoke_user
         pass
 
 
-class Exit():
+class Exit:
     def __init__(self):
         self.type = NodeType.exit
 
 
-class PrintTable():
+class PrintTable:
     def __init__(self, table_name):
         self.type = NodeType.print_table
         self.table_name = table_name
 
 
-class ShowTables():
+class ShowTables:
     def __init__(self, table_name):
         self.type = NodeType.show_tables
         self.table_name = table_name
 
 
-class Value():
+class Value:
     def __init__(self, value_type, value):
         self.type = NodeType.value
         self.value_type = value_type
         self.value = value
 
+    def __str__(self):
+        return str(self.value) + '['+  self.value_type + ']'
 
-class RelAttr():
+
+class RelAttr:
     def __init__(self, attr_name, table_name=None):
         self.type = NodeType.relation_attr
         self.table_name = table_name
@@ -144,15 +150,18 @@ class RelAttr():
             return self.attr_name
 
 
-class Cond():
+class Cond:
     def __init__(self, left, op, right):
         self.type = NodeType.condition
         self.op = upper(op)
         self.left = left
         self.right = right
 
+    def __str__(self):
+        return '(' + str(self.left) + ', ' + str(self.right)+ ', ' + self.op + ')'
 
-class AttrType():
+
+class AttrType:
     def __init__(self, attr_type, attr_name):
         self.type = NodeType.attr_type
         self.attr_type = attr_type

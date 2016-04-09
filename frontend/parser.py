@@ -64,7 +64,6 @@ def p_showtables(p):
 def p_createuser(p):
     """ createuser : CREATE USER ID PASSWORD STRING"""
     p[0] = CreateUserNode(p[3], p[5])
-    # TODO: create user
 
 
 def p_grantuser(p):
@@ -75,6 +74,7 @@ def p_grantuser(p):
 
 def p_revokeuser(p):
     """ revokeuser : REVOKE non_mrelation_list ON non_mrelation_list FROM non_mrelation_list """
+    # TODO: revoke user
     pass
 
 
@@ -208,7 +208,7 @@ def p_non_mrelation_list(p):
 
 def p_relation(p):
     """ relation : ID """
-    p[0] = RelAttr(p[1])
+    p[0] = p[1]
 
 
 def p_opwhere_clause(p):
@@ -267,7 +267,7 @@ def p_value_number(p):
 
 def p_null_value(p):
     """ null_value : NULL """
-    p[0] = Value('NULL', 0)
+    p[0] = Value('NULL', None)
 
 
 def p_op(p):
