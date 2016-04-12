@@ -184,7 +184,7 @@ def p_non_mrelattr_list(p):
                           | relattr """
     if len(p) == 2:
         p[0] = [p[1]]
-    else :
+    else:
         p[0] = [p[1]] + p[3]
 
 
