@@ -160,11 +160,11 @@ def p_attrtype(p):
                  | ID type '(' NUMBER ')'
                  | PRIMARY KEY '(' ID ')' """
     if len(p) == 3:
-        p[0] = AttrType(p[2], p[1])
+        p[0] = AttrType(p[1], p[2])
     elif len(p) == 5:
-        p[0] = AttrType((p[2], p[4]), p[1])
+        p[0] = AttrType(p[1], p[2], p[4])
     else:
-        p[0] = AttrType('PK', p[4])
+        p[0] = AttrType(p[4], 'PK')
 
 
 def p_type(p):

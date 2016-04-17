@@ -163,8 +163,11 @@ class Cond:
 
 
 class AttrType:
-    def __init__(self, attr_type, attr_name):
+    def __init__(self, attr_name, attr_type, type_len = 1):
         self.type = NodeType.attr_type
         self.attr_type = attr_type
+        self.type_len = type_len
         self.attr_name = attr_name
 
+    def __str__(self):
+        return self.attr_name + " " + self.attr_type + " " + str(self.type_len)
