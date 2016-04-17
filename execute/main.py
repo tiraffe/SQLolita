@@ -42,7 +42,7 @@ def execute_drop_table(node):
     # TODO remove index
 
 
-def print_table(names, data, width):
+def print_table(names, data, width = COLUMN_WIDTH):
     table = "┌"
     n = len(names)
     for i in range(n): table += "─" * width + ("┬" if i != n - 1 else "┐\n")
@@ -65,7 +65,7 @@ def execute_print_table(node):
         return
     names = data_dict.table_attr_names(node.table_name)
     data = TableFile(data_dict, node.table_name).load_data()
-    print_table(names, data, COLUMN_WIDTH)
+    print_table(names, data)
 
 def execute_main(command):
     """

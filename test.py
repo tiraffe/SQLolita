@@ -31,7 +31,7 @@ drop_table_test = "drop table A;"
 
 
 res = parser.parse(print_test, lexer=lex)
-from execute import *
+from execute.main import *
 
 execute_main(res)
 
