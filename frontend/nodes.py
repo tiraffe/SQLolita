@@ -123,9 +123,8 @@ class PrintTable:
 
 
 class ShowTables:
-    def __init__(self, table_name):
+    def __init__(self):
         self.type = NodeType.show_tables
-        self.table_name = table_name
 
 
 class Value:

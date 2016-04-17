@@ -58,7 +58,7 @@ def p_utility(p):
 
 def p_showtables(p):
     """ showtables : SHOW TABLES """
-    p[0] = ShowTables(p[2])
+    p[0] = ShowTables()
 
 
 def p_createuser(p):
@@ -161,10 +161,10 @@ def p_attrtype(p):
                  | PRIMARY KEY '(' ID ')' """
     if len(p) == 3:
         p[0] = AttrType(p[1], p[2])
-    elif len(p) == 5:
-        p[0] = AttrType(p[1], p[2], p[4])
-    else:
+    elif upper(p[1]) == "PRIMARY":
         p[0] = AttrType(p[4], 'PK')
+    else:
+        p[0] = AttrType(p[1], p[2], p[4])
 
 
 def p_type(p):

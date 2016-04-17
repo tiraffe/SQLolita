@@ -11,11 +11,11 @@ create table A(
   age int,
   grade int,
   id int,
-  PRIMARY KEY (id)
+  primary KEY (id)
 );
 """
 
-insert_test = "insert into A values(1, 2, 3, 'ABC'), (3, 4, 5, 'CDF');"
+insert_test = "insert into A values('x', 1, 2, 3), ('y', 3, 4, 5);"
 
 delete_test = "delete from A where id = 1;"
 
@@ -29,6 +29,9 @@ alert_drop_test = "alert table A drop num;"
 
 drop_table_test = "drop table A;"
 
-res = parser.parse(alert_drop_test, lexer=lex)
-print vars(res)
+
+res = parser.parse(insert_test, lexer=lex)
+from execute import *
+
+execute_main(res)
 

@@ -9,11 +9,14 @@ class DataDict:
         self.file_path = file_path
         self.load_data()
 
+    def has_table(self, table_name):
+        return self.dict.has_key(table_name)
+
     def tables_name(self):
         return self.dict.keys()
 
     def load_data(self):
-        f = open(self.file_path, "r")
+        f = open(self.file_path, "a+")
         table_name = "default"
         while True:
             line = f.readline()
@@ -22,7 +25,6 @@ class DataDict:
 
             if line[0] == '[':
                 table_name = line[1:-2]
-                print table_name
             elif len(line) > 1:
                 items = line[:-1].split()
                 if not self.dict.has_key(table_name):
@@ -42,13 +44,13 @@ class DataDict:
         f.close()
 
 
+if __name__ == '__main__':
+    data = DataDict("../database/dict.txt")
+    # print data.tables_name()
 
-data = DataDict("data.txt")
-print data.tables_name()
-
-# data.dict = {
-#     "A" : [AttrType("age", "INT", 0), AttrType("name", "CHAR", 10)],
-#     "B" : [AttrType("age", "INT", 0), AttrType("name", "CHAR", 10), AttrType("age", "PK", 0)]
-# }
-# data.write_back()
+    # data.dict = {
+    #     "A" : [AttrType("age", "INT", 0), AttrType("name", "CHAR", 10)],
+    #     "B" : [AttrType("age", "INT", 0), AttrType("name", "CHAR", 10), AttrType("age", "PK", 0)]
+    # }
+    # data.write_back()
 
