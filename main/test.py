@@ -30,7 +30,7 @@ alert_drop_test = "alert table A drop num;"
 drop_table_test = "drop table A;"
 
 
-res = parser.parse(insert_test, lexer=lex)
+res = parser.parse(print_test, lexer=lex)
 from execute import *
 
 execute_main(res)

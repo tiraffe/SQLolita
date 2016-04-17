@@ -18,8 +18,8 @@ class TableFile:
             if not line: break
             items = line[:-1].split()
             self.data_list.append(items)
-        print self.data_list
         f.close()
+        return self.data_list
 
     def write_back(self):
         f = open(TABLES_PATH + self.table_name, 'w')

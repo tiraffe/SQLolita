@@ -5,7 +5,7 @@ from frontend.parser import parser
 from execute import execute_main
 
 while True:
-    line = raw_input("SQLolita >")
+    line = raw_input("SQLolita > ")
     while ';' not in line:
         line += ' ' + raw_input()
 
