@@ -40,6 +40,7 @@ def execute_drop_table(node):
     data_dict.write_back()
     os.remove(TABLES_PATH + node.table_name) # remove table file
     # TODO remove index
+    print "Drop table successful."
 
 
 def print_table(names, data, width = COLUMN_WIDTH):

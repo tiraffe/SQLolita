@@ -5,11 +5,11 @@ from frontend.parser import parser
 from execute.main import execute_main
 
 while True:
-    line = raw_input("SQLolita > ")
-    while ';' not in line:
-        line += ' ' + raw_input()
+    command = raw_input("SQLolita > ")
+    while ';' not in command:
+        command += " " + raw_input()
 
-    result = parser.parse(line, lexer=lex)
+    result = parser.parse(command, lexer=lex)
     if not result: continue
 
     # print "OK"

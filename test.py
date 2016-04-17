@@ -27,10 +27,10 @@ alert_add_test = "alert table A add num char(20);"
 
 alert_drop_test = "alert table A drop num;"
 
-drop_table_test = "drop table A;"
+drop_table_test = "drop table mumu;"
 
 
-res = parser.parse(print_test, lexer=lex)
+res = parser.parse(drop_table_test, lexer=lex)
 from execute.main import *
 
 execute_main(res)
