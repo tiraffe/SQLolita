@@ -1,0 +1,9 @@
+[A]
+age INT 0
+name CHAR 10
+
+[B]
+age INT 0
+name CHAR 10
+age PK 0
+
