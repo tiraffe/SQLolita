@@ -19,7 +19,7 @@ insert_test = "insert into A values('x', 1, 2, 3), ('y', 3, 4, 5);"
 
 delete_test = "delete from A where id = 1;"
 
-update_test = "update A set age = 1 where id > 100;"
+update_test = "update A set age = 1 where id = 2;"
 
 print_test = "print A;"
 
@@ -30,7 +30,7 @@ alert_drop_test = "alert table A drop num;"
 drop_table_test = "drop table mumu;"
 
 
-res = parser.parse(drop_table_test, lexer=lex)
+res = parser.parse(alert_drop_test, lexer=lex)
 from execute.main import *
 
 execute_main(res)

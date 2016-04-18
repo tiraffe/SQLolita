@@ -17,6 +17,8 @@ class TableFile:
             line = f.readline()
             if not line: break
             items = line[:-1].split()
+            for idx in range(len(self.attrs)):
+                if self.attrs[idx].attr_type == "INT": items[idx] = int(items[idx])
             self.data_list.append(items)
         f.close()
         return self.data_list

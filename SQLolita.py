@@ -4,6 +4,7 @@ from frontend.lexer import lexer as lex
 from frontend.parser import parser
 from execute.main import execute_main
 
+
 while True:
     command = raw_input("SQLolita > ")
     while ';' not in command:
@@ -11,6 +12,7 @@ while True:
 
     result = parser.parse(command, lexer=lex)
     if not result: continue
+    if result.type == "EXIT": break
 
     # print "OK"
     execute_main(result)
