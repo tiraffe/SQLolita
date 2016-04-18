@@ -57,7 +57,7 @@ def print_table(names, data, width = COLUMN_WIDTH):
         for item in line: table += fmt % item
         table += "│\n"
     table += "└"
-    for i in range(n): table += "─" * width + ("┴" if i != n - 1 else "┘\n")
+    for i in range(n): table += "─" * width + ("┴" if i != n - 1 else "┘")
     print table.decode('utf-8')
 
 
@@ -97,6 +97,7 @@ def execute_alert(node):
     table.data_list = data
     table.write_back()
     data_dict.write_back()
+    print "Alert table successful."
 
 
 def execute_delete(node):
@@ -107,11 +108,16 @@ def execute_delete(node):
     names = data_dict.table_attr_names(node.table_name)
     table = TableFile(data_dict, node.table_name)
     data = table.load_data()
+    old_len = len(data)
     try:
         table.data_list = [line for line in data if not check_where(node.where_list, names, line)]
     except Exception, e:
         print "Error: %s." % e
+        # print traceback.format_exc()
+        return
+    new_len = len(table.data_list)
     table.write_back()
+    print "%d line(s) are deleted." % (old_len - new_len)
 
 
 def set_value(data, names, set_list):
@@ -123,7 +129,7 @@ def set_value(data, names, set_list):
     b = __get_value(set_list[1], dict)
 
     if type(a) != type(b):
-        raise Exception("Type not match.")
+        raise Exception("Type not match")
     data[names.index(left)] = b
 
 
@@ -135,15 +141,18 @@ def execute_update(node):
     names = data_dict.table_attr_names(node.table_name)
     table = TableFile(data_dict, node.table_name)
     data = table.load_data()
+    updated_lines = 0
     try:
         for idx in range(len(data)):
             if check_where(node.where_list, names, data[idx]):
+                updated_lines += 1
                 set_value(data[idx], names, node.set_list)
     except Exception, e:
         print "Error: %s." % e
-        print traceback.format_exc()
+        # print traceback.format_exc()
         return
     table.write_back()
+    print "%d line(s) are updated." % updated_lines
 
 
 def execute_select(node):
