@@ -32,7 +32,7 @@ drop_table_test = "drop table mumu;"
 
 a = [0, 1, 2, 3]
 a.insert(2, 100)
-print a
+print a.pop()
 res = parser.parse(alert_drop_test, lexer=lex)
 from execute.main import *
 
