@@ -6,4 +6,4 @@ DATA_DICT_PATH = "database/dict.txt"
 TABLES_PATH = "database/tables/"
 
 # Appearance
-COLUMN_WIDTH = 3
+COLUMN_WIDTH = 4

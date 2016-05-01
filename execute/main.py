@@ -84,7 +84,7 @@ def execute_alert(node):
             print "Error: The attr's name already exists."
             return
         data_dict.dict[node.table_name] += [node.attr_list]
-        for idx in range(len(data)): data[idx].append("0")
+        for idx in range(len(data)): data[idx].append("NULL")
     elif node.op == "DROP":
         attr_name = node.attr_list[0]
         if attr_name not in names:
@@ -128,7 +128,7 @@ def set_value(data, names, set_list):
     a = __get_value(set_list[0], dict)
     b = __get_value(set_list[1], dict)
 
-    if type(a) != type(b):
+    if a != 'NULL' and b != 'NULL' and type(a) != type(b):
         raise Exception("Type not match")
     data[names.index(left)] = b
 
@@ -187,6 +187,7 @@ def __check_node(node, dict):
 
 
 def check_where(where_node, names, data_line):
+    if not where_node: return True
     dict = {}
     for idx in range(len(names)):
         dict[names[idx]] = data_line[idx]
