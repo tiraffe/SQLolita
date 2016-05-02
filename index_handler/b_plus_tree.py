@@ -32,9 +32,28 @@ class BPTree:
     def __init__(self, node_size):
         self.root = LeafNode([], [])
         self.node_size = node_size
+        self.total = 0
 
     def __str__(self):
         return str(self.root)
+
+    def count_values(self):
+        return  self.__count_values(self.root, None)
+
+    def exist(self, key):
+        node = self.search(key)
+        return node and key in node.keys
+
+    def __count_values(self, node, parent):
+        if parent:
+            assert node.parent == parent
+        res = 0
+        if node.type == 'leaf':
+            return len(node.values)
+        else:
+            for u in node.pointers:
+               res += self.__count_values(u, node)
+        return res
 
     # In an increasing list, find first i that key < list[i].
     @staticmethod
@@ -64,6 +83,7 @@ class BPTree:
         return self.__search(key, self.root)
 
     def __search(self, key, node):
+        assert len(node.keys) <= self.node_size
         if node.type == 'leaf':
             return node
         else:
@@ -72,17 +92,19 @@ class BPTree:
 
     # Insert a new pair(key, val).
     def insert(self, key, val):
+        if self.exist(key):
+            return False
         leaf = self.search(key)
         self.__insert(leaf, key, val)
+        self.total += 1
+        return True
 
     def __insert(self, node, key, val):
-        # print 'insert:' + str(key) + 'node :' + str(node)
         if self.node_size > len(node.keys):
             self.__insert_into_leaf(node, key, val)
         else:
             self.__insert_into_leaf(node, key, val)
             (left, mid_key, right) = self.__split_leaf(node)
-            # print left, mid_key, right
             self.__insert_into_interior(node.parent, left, mid_key, right)
 
     def __insert_into_leaf(self, node, key, val):
@@ -97,7 +119,6 @@ class BPTree:
             self.root.parent = None
         else:
             pos = self.__find_position(mid_key, node.keys)
-            # print mid_key, node.keys
             node.keys.insert(pos, mid_key)
             node.pointers[pos] = left_node
             node.pointers.insert(pos + 1, right_node)
@@ -135,6 +156,7 @@ class BPTree:
             return False
         else:
             self.__delete(leaf, key)
+            self.total -= 1
             return True
 
     def __delete(self, node, key):
@@ -150,7 +172,7 @@ class BPTree:
                 move_key = left_sibling.keys.pop()
                 move_val = left_sibling.values.pop()
                 pos = self.__find_position(move_key, node.parent.keys)
-                node.parent.keys[pos] = move_key
+                node.parent.keys[pos] = move_key  # TODO list assignment index out of range
                 node.keys.insert(0, move_key)
                 node.values.insert(0, move_val)
             elif right_sibling and len(right_sibling.keys) > self.node_size / 2:
@@ -159,17 +181,17 @@ class BPTree:
                 del right_sibling.keys[0]
                 del right_sibling.values[0]
                 pos = self.__find_position(node.keys[-1], node.parent.keys)
-                node.parent.keys[pos] = move_key
+                node.parent.keys[pos] = move_key  # TODO list assignment index out of range
                 node.keys.append(move_key)
                 node.values.append(move_val)
             elif left_sibling is not None:
-                left_sibling.keys.eppend(node.keys)
-                left_sibling.values.eppend(node.values)
-                pos = self.__find_position(left_sibling.key[0], node.parent.keys)
+                left_sibling.keys += [node.keys]
+                left_sibling.values += [node.values]
+                pos = self.__find_position(left_sibling.keys[0], node.parent.keys)
                 self.__delete_interior_node(node.parent, pos)
             elif right_sibling is not None:
-                node.keys.eppend(right_sibling)
-                node.values.eppend(right_sibling)
+                node.keys += [right_sibling]
+                node.values += [right_sibling]
                 pos = self.__find_position(right_sibling.keys[0], node.parent.keys) - 1
                 self.__delete_interior_node(node.parent, pos)
 
@@ -178,18 +200,18 @@ class BPTree:
             return
         if node == self.root:
             if len(node.keys) == 1:
-                self.root = self.root.pointer[0]
+                self.root = self.root.pointers[0]
             else:
                 del self.root.keys[pos]
-                del self.root.pointer[pos + 1]
+                del self.root.pointers[pos + 1]
         else:
-            del node.keys[pos]
-            del node.pointer[pos + 1]
+            left_sibling = self.__left_sibling(node)
+            right_sibling = self.__right_sibling(node)
+            del node.keys[pos]   # TODO list assignment index out of range
+            del node.pointers[pos + 1]  # TODO list assignment index out of range
             if len(node.keys) > 0:
                 pass # Already dene.
             else:
-                left_sibling = self.__left_sibling(node)
-                right_sibling = self.__right_sibling(node)
                 if left_sibling and len(left_sibling.keys) > 1:
                     move_key = left_sibling.keys.pop()
                     move_ptr = left_sibling.pointers.pop()
@@ -217,9 +239,17 @@ class BPTree:
                     right_sibling.pointers.append(node.pointers[0])
                     self.__delete_interior_node(node.parent, pos)
 
-if __name__ == "__main__":
-    tree = BPTree(3)
-    for i in range(20):
-        tree.insert(i, 'x')
 
-    print tree
+if __name__ == "__main__":
+    tree = BPTree(5)
+    ok = True
+    for x in range(100):
+        list = [random.randint(1, 100) for i in range(1000)]
+        random.shuffle(list)
+        for i in list:
+            tree.insert(i, 'x')
+            tree.delete((i + 37) % 88)
+        # print tree
+        if tree.count_values() != tree.total: ok = False
+
+    print ok
