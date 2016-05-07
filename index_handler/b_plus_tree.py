@@ -37,22 +37,35 @@ class BPTree:
     def __str__(self):
         return "Tree: " + str(self.root)
 
-    def keys(self):
-        return  self.__keys(self.root, None)
+    def clear(self):
+        self.root = LeafNode([], [])
+        self.total = 0
+
+    def get(self, key):
+        node = self.search(key)
+        if node and key in node.keys:
+            pos = node.keys.index(key)
+            return node.values[pos]
+        else:
+            return None
+
+
+    def pairs(self):
+        return  self.__pairs(self.root, None)
 
     def exist(self, key):
         node = self.search(key)
-        return node and key in node.keys
+        return node is not None and key in node.keys
 
-    def __keys(self, node, parent):
+    def __pairs(self, node, parent):
         if parent:
             assert node.parent == parent
         res = []
         if node.type == 'leaf':
-            return node.values
+            return [(node.keys[i], node.values[i]) for i in range(len(node.keys))]
         else:
             for u in node.pointers:
-               res += self.__keys(u, node)
+               res += self.__pairs(u, node)
         return res
 
     def __update_parents(self, node, parent):
@@ -265,12 +278,12 @@ if __name__ == "__main__":
     tree = BPTree(6)
     ok = True
     X = set()
-    for x in range(1000):
-        list = [random.randint(1, 100) for i in range(100)]
+    for x in range(1):
+        list = [random.randint(1, 100) for i in range(10)]
         random.shuffle(list)
         for i in list:
             tree.insert(i, 'x')
-            del_key = (i + 37) % 20
+            del_key = (i + 37) % 100
             tree.delete(del_key)
             X.add(i)
             if del_key in X:

@@ -29,6 +29,8 @@ alert_drop_test = "alert table A drop num;"
 
 drop_table_test = "drop table mumu;"
 
+dic = {}
+print len(dic)
 
 res = parser.parse(alert_drop_test, lexer=lex)
 from execute.main import *

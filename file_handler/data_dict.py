@@ -15,6 +15,9 @@ class DataDict:
     def table_attr_names(self, table_name):
         return [attr.attr_name for attr in self.dict[table_name] if attr.attr_type != "PK"]
 
+    def attr_type(self, table_name, attr_name):
+        return self.dict[table_name].attr_type
+
     def tables_name(self):
         return self.dict.keys()
 

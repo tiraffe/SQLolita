@@ -2,7 +2,6 @@
 # Created by Tian Yuanhao on 2016/4/17.
 from config.config import TABLES_PATH
 
-
 class TableFile:
     def __init__(self, data_dict, table_name, insert_list = None):
         self.attrs = [attr for attr in data_dict.dict[table_name] if attr.attr_type != "PK"]
@@ -30,9 +29,9 @@ class TableFile:
             f.write("\n")
         f.close()
 
-    def insert(self):
+    def insert(self, index_dict):
         f = open(TABLES_PATH + self.table_name, 'a')
-        if not self.__check_type() or not self.__check_index():
+        if not self.__check_type() or not self.__check_index(index_dict):
             return False
         text = ""
         for value_list in self.insert_list:
@@ -40,9 +39,13 @@ class TableFile:
             text += '\n'
         f.write(text)
         f.close()
+        return True
 
-    def __check_index(self):
-        # TODO check index.
+    def __check_index(self, dict):
+        for index_name, index in dict.index_dict[self.table_name].items():
+            for line in self.insert_list:
+                if index.has(line[index.pos].value):
+                    return False
         return True
 
     def __check_type(self):

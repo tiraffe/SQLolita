@@ -4,13 +4,17 @@ import traceback
 
 from file_handler.data_dict import DataDict
 from file_handler.table_file import TableFile
+from index_handler.index_dict import IndexDict
 from frontend.nodes import NodeType
 from config.config import *
 import os
 
 
+data_dict = DataDict(DATA_DICT_PATH)
+index_dict = IndexDict(INDEX_PATH)
+
+
 def execute_create_table(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if data_dict.has_table(node.table_name):
         print "Error: This table already exists."
         return
@@ -20,28 +24,27 @@ def execute_create_table(node):
 
 
 def execute_show_tables(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     print data_dict.tables_name()
 
 
 def execute_insert(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
     table = TableFile(data_dict, node.table_name, node.value_list)
-    table.insert()
+    if not table.insert(index_dict):
+        print "Error: Types are not matched or index duplicated"
+    index_dict.load_index()
 
 
 def execute_drop_table(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
     del data_dict.dict[node.table_name]     # remove data dict
     data_dict.write_back()
     os.remove(TABLES_PATH + node.table_name) # remove table file
-    # TODO remove index
+    index_dict.drop_table(node.table_name)
     print "Drop table successful."
 
 
@@ -62,7 +65,6 @@ def print_table(names, data, width = COLUMN_WIDTH):
 
 
 def execute_print_table(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -72,7 +74,6 @@ def execute_print_table(node):
 
 
 def execute_alert(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -94,6 +95,7 @@ def execute_alert(node):
         data_dict.dict[node.table_name] = [attr for attr in old_list if attr.attr_name != attr_name]
         idx_remove = names.index(attr_name)
         for idx in range(len(data)): del data[idx][idx_remove]
+        index_dict.drop_index(node.table_name, attr_name)
     table.data_list = data
     table.write_back()
     data_dict.write_back()
@@ -101,7 +103,6 @@ def execute_alert(node):
 
 
 def execute_delete(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -117,6 +118,7 @@ def execute_delete(node):
         return
     new_len = len(table.data_list)
     table.write_back()
+    index_dict.load_index()
     print "%d line(s) are deleted." % (old_len - new_len)
 
 
@@ -134,7 +136,6 @@ def set_value(data, names, set_list):
 
 
 def execute_update(node):
-    data_dict = DataDict(DATA_DICT_PATH)
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -157,6 +158,37 @@ def execute_update(node):
 
 def execute_select(node):
     pass
+
+
+def execute_create_index(node):
+    if not data_dict.has_table(node.table_name):
+        print "Error: The table does not exist."
+        return
+    attr_names = data_dict.table_attr_names(node.table_name)
+    if node.attr_name not in attr_names:
+        print "Error: The table_attr does not exist."
+        return
+    if index_dict.has_index(node.table_name, node.attr_name):
+        print "Error: The index already exist."
+        return
+    data = TableFile(data_dict, node.table_name).load_data()
+    index_dict.create_index(node.table_name, node.attr_name, attr_names, data)
+    index_dict.write_back()
+
+
+def execute_drop_index(node):
+    if not data_dict.has_table(node.table_name):
+        print "Error: The table does not exist."
+        return
+    attr_names = data_dict.table_attr_names(node.table_name)
+    if node.attr_name not in attr_names:
+        print "Error: The table_attr does not exist."
+        return
+    if not index_dict.has_index(node.table_name, node.attr_name):
+        print "Error: The index does not exist."
+        return
+    index_dict.drop_index(node.table_name, node.attr_name)
+    index_dict.write_back()
 
 
 def __get_value(node, dict):
@@ -219,4 +251,7 @@ def execute_main(command):
         execute_select(command)
     elif type == NodeType.print_table:
         execute_print_table(command)
-
+    elif type == NodeType.create_index:
+        execute_create_index(command)
+    elif type == NodeType.drop_index:
+        execute_drop_index(command)
