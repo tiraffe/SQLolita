@@ -178,16 +178,19 @@ def execute_select(node):
     if node.select_list[0] == "*":
         node.select_list = full_name
     try:
-        select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
-        res = query.joint(table_data)
-        res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
-        res = query.projection(res, select_col_nums)
+        res = None
+        if query.can_use_index(node.where_list, index_dict):
+            # Todo: query by index.
+            pass
+        else:
+            select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
+            res = query.joint(table_data)
+            res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
+            res = query.projection(res, select_col_nums)
+        print_table(node.select_list, res)
     except Exception, e:
         print "Error: %s." % e
         print traceback.format_exc()
-        return
-
-    print_table(node.select_list, res)
 
 
 def execute_create_index(node):
@@ -260,31 +263,25 @@ def check_where(where_node, part_names, data_line, full_names = None):
 
 
 def execute_main(command):
-    """
-    执行相应sql命令
-    :param command: sql语法树根节点
-    :return:
-    """
-    type = command.type
-    if type == NodeType.create_table:
+    if command.type == NodeType.create_table:
         execute_create_table(command)
-    elif type == NodeType.show_tables:
+    elif command.type == NodeType.show_tables:
         execute_show_tables(command)
-    elif type == NodeType.drop_table:
+    elif command.type == NodeType.drop_table:
         execute_drop_table(command)
-    elif type == NodeType.insert:
+    elif command.type == NodeType.insert:
         execute_insert(command)
-    elif type == NodeType.alert:
+    elif command.type == NodeType.alert:
         execute_alert(command)
-    elif type == NodeType.delete:
+    elif command.type == NodeType.delete:
         execute_delete(command)
-    elif type == NodeType.update:
+    elif command.type == NodeType.update:
         execute_update(command)
-    elif type == NodeType.select:
+    elif command.type == NodeType.select:
         execute_select(command)
-    elif type == NodeType.print_table:
+    elif command.type == NodeType.print_table:
         execute_print_table(command)
-    elif type == NodeType.create_index:
+    elif command.type == NodeType.create_index:
         execute_create_index(command)
-    elif type == NodeType.drop_index:
+    elif command.type == NodeType.drop_index:
         execute_drop_index(command)

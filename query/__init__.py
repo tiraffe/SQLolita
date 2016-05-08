@@ -27,3 +27,6 @@ def joint(tables):
 def select(table, col_num_list):
     return [table[i] for i in col_num_list]
 
+
+def can_use_index(where_list, index_dict):
+    return False

@@ -6,8 +6,10 @@ DATA_DICT_PATH = "database/dict.txt"
 TABLES_PATH = "database/tables/"
 INDEX_PATH = "database/index.txt"
 
-# Appearance
+# Table column width
 COLUMN_WIDTH = 5
 
 # B+ Tree Node Size
 BP_TREE_SIZE = 3
+
+LOGIN_PASSWORD = "tyh"
