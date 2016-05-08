@@ -7,7 +7,7 @@ TABLES_PATH = "database/tables/"
 INDEX_PATH = "database/index.txt"
 
 # Appearance
-COLUMN_WIDTH = 4
+COLUMN_WIDTH = 5
 
 # B+ Tree Node Size
 BP_TREE_SIZE = 3

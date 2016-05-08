@@ -7,8 +7,8 @@ from file_handler.table_file import TableFile
 from index_handler.index_dict import IndexDict
 from frontend.nodes import NodeType
 from config.config import *
+import query
 import os
-
 
 data_dict = DataDict(DATA_DICT_PATH)
 index_dict = IndexDict(INDEX_PATH)
@@ -45,7 +45,7 @@ def execute_drop_table(node):
     data_dict.write_back()
     os.remove(TABLES_PATH + node.table_name) # remove table file
     index_dict.drop_table(node.table_name)
-    print "Drop table successful."
+    print "Drop table '%s' successful." % node.table_name
 
 
 def print_table(names, data, width = COLUMN_WIDTH):
@@ -157,7 +157,37 @@ def execute_update(node):
 
 
 def execute_select(node):
-    pass
+    for table_name in node.from_list:
+        if not data_dict.has_table(table_name):
+            print "Error: The table '%s' does not exist." % table_name
+            return
+    part_name = []
+    full_name = []
+    table_data = []
+    for table_name in node.from_list:
+        names = data_dict.table_attr_names(table_name)
+        part_name += names
+        full_name += [table_name + '.' + attr_name for attr_name in names]
+        table_data += [TableFile(data_dict, table_name).load_data()]
+
+    name_dict = {}
+    for idx in range(len(full_name)):
+        name_dict[full_name[idx]] = idx
+        name_dict[part_name[idx]] = idx
+
+    if node.select_list[0] == "*":
+        node.select_list = full_name
+    try:
+        select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
+        res = query.joint(table_data)
+        res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
+        res = query.projection(res, select_col_nums)
+    except Exception, e:
+        print "Error: %s." % e
+        print traceback.format_exc()
+        return
+
+    print_table(node.select_list, res)
 
 
 def execute_create_index(node):
@@ -188,12 +218,11 @@ def execute_drop_index(node):
         print "Error: The index does not exist."
         return
     index_dict.drop_index(node.table_name, node.attr_name)
-    index_dict.write_back()
 
 
 def __get_value(node, dict):
     if node.type == NodeType.relation_attr:
-        return dict[node.attr_name]
+        return dict[str(node)]
     else:
         return node.value
 
@@ -218,11 +247,15 @@ def __check_node(node, dict):
         return __get_value(node.left, dict) != __get_value(node.right, dict)
 
 
-def check_where(where_node, names, data_line):
+def check_where(where_node, part_names, data_line, full_names = None):
+    assert len(part_names) == len(data_line)
     if not where_node: return True
     dict = {}
-    for idx in range(len(names)):
-        dict[names[idx]] = data_line[idx]
+    for idx in range(len(part_names)):
+        dict[part_names[idx]] = data_line[idx]
+    if full_names:
+        for idx in range(len(full_names)):
+            dict[full_names[idx]] = data_line[idx]
     return __check_node(where_node, dict)
 
 

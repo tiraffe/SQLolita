@@ -42,6 +42,8 @@ class TableFile:
         return True
 
     def __check_index(self, dict):
+        if self.table_name not in dict.index_dict.keys():
+            return True
         for index_name, index in dict.index_dict[self.table_name].items():
             for line in self.insert_list:
                 if index.has(line[index.pos].value):

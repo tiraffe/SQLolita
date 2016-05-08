@@ -27,9 +27,3 @@ def joint(tables):
 def select(table, col_num_list):
     return [table[i] for i in col_num_list]
 
-
-if __name__ == '__main__':
-    a = [[1, 2, 3], [4, 5, 6]]
-    b = [[3, 4], [6, 7]]
-    x = joint([a, b, b])
-    print x

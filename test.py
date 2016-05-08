@@ -6,12 +6,11 @@ from frontend.lexer import lexer as lex
 from frontend.parser import parser
 
 create_table_test = """
-create table A(
+create table A (
+  id int,
   name char(10),
   age int,
   grade int,
-  id int,
-  primary KEY (id)
 );
 """
 
@@ -29,11 +28,12 @@ alert_drop_test = "alert table A drop num;"
 
 drop_table_test = "drop table mumu;"
 
-dic = {}
-print len(dic)
 
-res = parser.parse(alert_drop_test, lexer=lex)
-from execute.main import *
+def exec_sql(sql):
+    res = parser.parse(sql, lexer=lex)
+    from execute.main import execute_main
+    execute_main(res)
 
-execute_main(res)
-
+exec_sql("print A;")
+exec_sql("print G;")
+exec_sql("select G.id, A.id from G, A where G.id > 2 and G.id > A.id;")
