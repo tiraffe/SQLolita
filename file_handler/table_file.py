@@ -2,6 +2,7 @@
 # Created by Tian Yuanhao on 2016/4/17.
 from config.config import TABLES_PATH
 
+
 class TableFile:
     def __init__(self, data_dict, table_name, insert_list = None):
         self.attrs = [attr for attr in data_dict.dict[table_name] if attr.attr_type != "PK"]

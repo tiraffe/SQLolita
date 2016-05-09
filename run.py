@@ -5,23 +5,33 @@ import getpass
 from frontend.lexer import lexer as lex
 from frontend.parser import parser
 from execute.main import execute_main
-from config.config import LOGIN_PASSWORD
+from config.config import *
+from file_handler.user_dict import UserDict
+
+user_dict = UserDict(USER_PATH)
+
 
 def login():
+    username = raw_input('Enter username: ')
     password = getpass.getpass('Enter password: ')
-    return password == LOGIN_PASSWORD
+    if user_dict.check(username, password):
+        UserDict.CurrentUser = username
+        return True
+    else:
+        return False
 
-while not login():
-    print "Password is not correct!"
+if __name__ == "__main__":
 
-while True:
-    command = raw_input("SQLolita > ")
-    while ';' not in command:
-        command += " " + raw_input()
+    # while not login(): print "Password or username is not correct!"
 
-    result = parser.parse(command, lexer=lex)
-    if not result: continue
-    if result.type == "EXIT": break
+    while True:
+        command = raw_input("SQLolita > ")
+        while ';' not in command:
+            command += " " + raw_input()
 
-    # print "OK"
-    execute_main(result)
+        result = parser.parse(command, lexer=lex)
+        if not result: continue
+        if result.type == "EXIT": break
+
+        # print "OK"
+        execute_main(result)

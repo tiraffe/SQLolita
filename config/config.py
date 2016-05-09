@@ -5,6 +5,7 @@
 DATA_DICT_PATH = "database/dict.txt"
 TABLES_PATH = "database/tables/"
 INDEX_PATH = "database/index.txt"
+USER_PATH = "database/user.txt"
 
 # Table column width
 COLUMN_WIDTH = 5

@@ -2,9 +2,12 @@
 # Created by Tian Yuanhao on 2016/4/17.
 import traceback
 
+import time
+
 from file_handler.data_dict import DataDict
 from file_handler.table_file import TableFile
 from index_handler.index_dict import IndexDict
+from file_handler.user_dict import UserDict
 from frontend.nodes import NodeType
 from config.config import *
 import query
@@ -12,6 +15,7 @@ import os
 
 data_dict = DataDict(DATA_DICT_PATH)
 index_dict = IndexDict(INDEX_PATH)
+user_dict = UserDict(USER_PATH)
 
 
 def execute_create_table(node):
@@ -156,7 +160,23 @@ def execute_update(node):
     print "%d line(s) are updated." % updated_lines
 
 
+def __can_use_index(table_name, where_node, index_dict):
+    if where_node.left.type == NodeType.relation_attr and where_node.right.type == NodeType.value \
+            and where_node.op == "=" and index_dict.has_index(table_name, where_node.left.attr_name):
+        return True
+    else:
+        return False
+
+
+def dur( op=None, clock=[time.time()]):
+    if op:
+        duration = time.time() - clock[0]
+        print '%s finished. Duration %.6f seconds.' % (op, duration)
+    clock[0] = time.time()
+
+
 def execute_select(node):
+    dur()
     for table_name in node.from_list:
         if not data_dict.has_table(table_name):
             print "Error: The table '%s' does not exist." % table_name
@@ -178,16 +198,17 @@ def execute_select(node):
     if node.select_list[0] == "*":
         node.select_list = full_name
     try:
-        res = None
-        if query.can_use_index(node.where_list, index_dict):
-            # Todo: query by index.
-            pass
+        select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
+        res = query.joint(table_data)
+        if len(node.from_list) == 1 and __can_use_index(node.from_list[0], node.where_list, index_dict):
+            val = node.where_list.right.value
+            num = index_dict.query(node.from_list[0], node.where_list.left.attr_name, [val])[0]
+            res = [res[num]]
         else:
-            select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
-            res = query.joint(table_data)
             res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
-            res = query.projection(res, select_col_nums)
+        res = query.projection(res, select_col_nums)
         print_table(node.select_list, res)
+        dur("Select")
     except Exception, e:
         print "Error: %s." % e
         print traceback.format_exc()
@@ -262,6 +283,13 @@ def check_where(where_node, part_names, data_line, full_names = None):
     return __check_node(where_node, dict)
 
 
+def execute_create_user(node):
+    if node.user_id in user_dict.password.keys():
+        print "Error: The username already existed."
+    user_dict.create_user(node.user_id, node.password)
+    user_dict.write_back()
+
+
 def execute_main(command):
     if command.type == NodeType.create_table:
         execute_create_table(command)
@@ -285,3 +313,5 @@ def execute_main(command):
         execute_create_index(command)
     elif command.type == NodeType.drop_index:
         execute_drop_index(command)
+    elif command.type == NodeType.create_user:
+        execute_create_user(command)

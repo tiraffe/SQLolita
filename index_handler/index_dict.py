@@ -91,7 +91,7 @@ class IndexHandler:
     def query_by_index(self, keys):
         res = []
         for key in keys:
-            res += self.tree.get(key)
+            res += [self.tree.get(key)]
         return res
 
 

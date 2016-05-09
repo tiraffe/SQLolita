@@ -34,12 +34,8 @@ def exec_sql(sql):
     from execute.main import execute_main
     execute_main(res)
 
-def f(x):
-    x += 1
 
-a = 1
-f(a)
-print a
-# exec_sql("print A;")
+exec_sql("select * from G where id = 1;")
+exec_sql("select * from G where price = 10;")
 # exec_sql("print G;")
 # exec_sql("select G.id, A.id from G, A where G.id > 2 and G.id > A.id;")
