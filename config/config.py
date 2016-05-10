@@ -12,5 +12,3 @@ COLUMN_WIDTH = 5
 
 # B+ Tree Node Size
 BP_TREE_SIZE = 3
-
-LOGIN_PASSWORD = "tyh"

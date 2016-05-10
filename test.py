@@ -10,11 +10,11 @@ create table A (
   id int,
   name char(10),
   age int,
-  grade int,
+  grade int
 );
 """
 
-insert_test = "insert into A values('x', 1, 2, 3), ('y', 3, 4, 5);"
+insert_test = "insert into A values(5, 'c', 33, 24), (6, 'd', 33, 11);"
 
 delete_test = "delete from A where id = 1;"
 
@@ -28,14 +28,19 @@ alert_drop_test = "alert table A drop num;"
 
 drop_table_test = "drop table mumu;"
 
+def test_big():
+    f = open("test.txt", 'w')
+    for i in range(10000):
+        f.write(str(i) + " " + str(i) + "\n")
+    f.close()
 
 def exec_sql(sql):
     res = parser.parse(sql, lexer=lex)
     from execute.main import execute_main
     execute_main(res)
 
+exec_sql("drop user tyh password 'tyh';")
+#exec_sql("insert into big values(1, 1), (2 ,2);")
 
-exec_sql("select * from G where id = 1;")
-exec_sql("select * from G where price = 10;")
-# exec_sql("print G;")
-# exec_sql("select G.id, A.id from G, A where G.id > 2 and G.id > A.id;")
+# exec_sql("print B;")
+# exec_sql("select B.id, A.id from B, A where B.id > 2 and B.id > A.id;")

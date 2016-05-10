@@ -2,8 +2,8 @@
 # Created by Tian Yuanhao on 2016/5/6.
 
 from b_plus_tree import BPTree
-from file_handler.data_dict import DataDict
-from file_handler.table_file import TableFile
+from handler.data_dict import DataDict
+from handler.table_file import TableFile
 from config.config import *
 
 

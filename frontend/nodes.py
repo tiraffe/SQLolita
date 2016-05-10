@@ -98,17 +98,19 @@ class CreateUserNode:
 
 
 class GrantUserNode:
-    # TODO this
-    def __init__(self):
+    def __init__(self, power_list, table_list, user_list):
         self.type = NodeType.grant_user
-        pass
+        self.power_list = power_list
+        self.table_list = table_list
+        self.user_list = user_list
 
 
 class RevokeUserNode:
-    # TODO this
-    def __init__(self):
+    def __init__(self, power_list, table_list, user_list):
         self.type = NodeType.revoke_user
-        pass
+        self.power_list = power_list
+        self.table_list = table_list
+        self.user_list = user_list
 
 
 class Exit:

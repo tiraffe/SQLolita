@@ -67,15 +67,32 @@ def p_createuser(p):
 
 
 def p_grantuser(p):
-    """ grantuser : GRANT non_mrelation_list ON non_mrelation_list TO non_mrelation_list """
-    # TODO: grant user
-    pass
+    """ grantuser : GRANT power_list ON non_mrelation_list TO non_mrelation_list """
+    p[0] = GrantUserNode(p[2], p[4], p[6])
 
 
 def p_revokeuser(p):
-    """ revokeuser : REVOKE non_mrelation_list ON non_mrelation_list FROM non_mrelation_list """
-    # TODO: revoke user
-    pass
+    """ revokeuser : REVOKE power_list ON non_mrelation_list FROM non_mrelation_list """
+    p[0] = RevokeUserNode(p[2], p[4], p[6])
+
+
+def p_power_list(p):
+    """ power_list : power_list ',' power_type
+                   | power_type """
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1] + [p[3]]
+
+def p_power_type(p):
+    """  power_type : SELECT
+                    | UPDATE
+                    | INSERT
+                    | DELETE
+                    | PRINT
+                    | ALL
+    """
+    p[0] = p[1]
 
 
 def p_alerttable(p):

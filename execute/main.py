@@ -4,10 +4,10 @@ import traceback
 
 import time
 
-from file_handler.data_dict import DataDict
-from file_handler.table_file import TableFile
-from index_handler.index_dict import IndexDict
-from file_handler.user_dict import UserDict
+from handler.data_dict import DataDict
+from handler.table_file import TableFile
+from index.index_dict import IndexDict
+from handler.user_dict import UserDict
 from frontend.nodes import NodeType
 from config.config import *
 import query
@@ -168,7 +168,7 @@ def __can_use_index(table_name, where_node, index_dict):
         return False
 
 
-def dur( op=None, clock=[time.time()]):
+def __dur(op=None, clock=[time.time()]):
     if op:
         duration = time.time() - clock[0]
         print '%s finished. Duration %.6f seconds.' % (op, duration)
@@ -176,7 +176,7 @@ def dur( op=None, clock=[time.time()]):
 
 
 def execute_select(node):
-    dur()
+    __dur()
     for table_name in node.from_list:
         if not data_dict.has_table(table_name):
             print "Error: The table '%s' does not exist." % table_name
@@ -200,48 +200,19 @@ def execute_select(node):
     try:
         select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
         res = query.joint(table_data)
-        if len(node.from_list) == 1 and __can_use_index(node.from_list[0], node.where_list, index_dict):
+        if node.where_list and len(node.from_list) == 1 \
+                and __can_use_index(node.from_list[0], node.where_list, index_dict):
             val = node.where_list.right.value
             num = index_dict.query(node.from_list[0], node.where_list.left.attr_name, [val])[0]
-            res = [res[num]]
+            res = [res[num]] if num else []
         else:
             res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
         res = query.projection(res, select_col_nums)
         print_table(node.select_list, res)
-        dur("Select")
+        __dur("Select")
     except Exception, e:
         print "Error: %s." % e
-        print traceback.format_exc()
-
-
-def execute_create_index(node):
-    if not data_dict.has_table(node.table_name):
-        print "Error: The table does not exist."
-        return
-    attr_names = data_dict.table_attr_names(node.table_name)
-    if node.attr_name not in attr_names:
-        print "Error: The table_attr does not exist."
-        return
-    if index_dict.has_index(node.table_name, node.attr_name):
-        print "Error: The index already exist."
-        return
-    data = TableFile(data_dict, node.table_name).load_data()
-    index_dict.create_index(node.table_name, node.attr_name, attr_names, data)
-    index_dict.write_back()
-
-
-def execute_drop_index(node):
-    if not data_dict.has_table(node.table_name):
-        print "Error: The table does not exist."
-        return
-    attr_names = data_dict.table_attr_names(node.table_name)
-    if node.attr_name not in attr_names:
-        print "Error: The table_attr does not exist."
-        return
-    if not index_dict.has_index(node.table_name, node.attr_name):
-        print "Error: The index does not exist."
-        return
-    index_dict.drop_index(node.table_name, node.attr_name)
+        # print traceback.format_exc()
 
 
 def __get_value(node, dict):
@@ -283,11 +254,53 @@ def check_where(where_node, part_names, data_line, full_names = None):
     return __check_node(where_node, dict)
 
 
+def execute_create_index(node):
+    if not data_dict.has_table(node.table_name):
+        print "Error: The table does not exist."
+        return
+    attr_names = data_dict.table_attr_names(node.table_name)
+    if node.attr_name not in attr_names:
+        print "Error: The table_attr does not exist."
+        return
+    if index_dict.has_index(node.table_name, node.attr_name):
+        print "Error: The index already exist."
+        return
+    data = TableFile(data_dict, node.table_name).load_data()
+    index_dict.create_index(node.table_name, node.attr_name, attr_names, data)
+    index_dict.write_back()
+
+
+def execute_drop_index(node):
+    if not data_dict.has_table(node.table_name):
+        print "Error: The table does not exist."
+        return
+    attr_names = data_dict.table_attr_names(node.table_name)
+    if node.attr_name not in attr_names:
+        print "Error: The table_attr does not exist."
+        return
+    if not index_dict.has_index(node.table_name, node.attr_name):
+        print "Error: The index does not exist."
+        return
+    index_dict.drop_index(node.table_name, node.attr_name)
+
+
 def execute_create_user(node):
     if node.user_id in user_dict.password.keys():
         print "Error: The username already existed."
-    user_dict.create_user(node.user_id, node.password)
+    user_dict.create_user(node.user_id, node.password, data_dict.tables_name())
     user_dict.write_back()
+
+
+def execute_grant_user(node):
+    user_dict.add_power(node.user_list, node.table_list, node.power_list)
+    user_dict.write_back()
+    print "Grant user successful!"
+
+
+def execute_revoke_user(node):
+    user_dict.remove_power(node.user_list, node.table_list, node.power_list)
+    user_dict.write_back()
+    print "Revoke user successful!"
 
 
 def execute_main(command):
@@ -315,3 +328,7 @@ def execute_main(command):
         execute_drop_index(command)
     elif command.type == NodeType.create_user:
         execute_create_user(command)
+    elif command.type == NodeType.grant_user:
+        execute_grant_user(command)
+    elif command.type == NodeType.revoke_user:
+        execute_revoke_user(command)

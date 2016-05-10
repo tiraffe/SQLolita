@@ -6,7 +6,7 @@ from frontend.lexer import lexer as lex
 from frontend.parser import parser
 from execute.main import execute_main
 from config.config import *
-from file_handler.user_dict import UserDict
+from handler.user_dict import UserDict
 
 user_dict = UserDict(USER_PATH)
 

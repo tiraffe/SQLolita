@@ -49,7 +49,6 @@ class BPTree:
         else:
             return None
 
-
     def pairs(self):
         return  self.__pairs(self.root, None)
 
@@ -275,11 +274,11 @@ class BPTree:
 
 
 if __name__ == "__main__":
-    tree = BPTree(6)
+    tree = BPTree(4)
     ok = True
     X = set()
-    for x in range(1):
-        list = [random.randint(1, 100) for i in range(10)]
+    for x in range(100):
+        list = [random.randint(0, 100) for i in range(100)]
         random.shuffle(list)
         for i in list:
             tree.insert(i, 'x')
@@ -288,5 +287,5 @@ if __name__ == "__main__":
             X.add(i)
             if del_key in X:
                 X.remove(del_key)
-            if len(X) !=  tree.total: ok = False
+            if len(X) !=  len(tree.pairs()): ok = False
     print ok

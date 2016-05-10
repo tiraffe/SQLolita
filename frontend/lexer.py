@@ -12,7 +12,7 @@ reversed = (
     'INDEX', 'LOAD', 'SET', 'INTO', 'VALUES', 'TABLES', 'ALERT', 'ADD', "ON", "TO",
     'PASSWORD',
     # Modifier
-    'PRIMARY', 'KEY', 'DESC', 'ASC',
+    'PRIMARY', 'KEY', 'DESC', 'ASC', 'ALL',
     # Const Value
     'NULL',
     # Command
