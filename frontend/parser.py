@@ -92,7 +92,7 @@ def p_power_type(p):
                     | PRINT
                     | ALL
     """
-    p[0] = p[1]
+    p[0] = upper(p[1])
 
 
 def p_alerttable(p):

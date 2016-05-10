@@ -22,9 +22,9 @@ def execute_create_table(node):
     if data_dict.has_table(node.table_name):
         print "Error: This table already exists."
         return
-    else:
-        data_dict.dict[node.table_name] = node.attr_list
-        data_dict.write_back()
+    data_dict.dict[node.table_name] = node.attr_list
+    data_dict.write_back()
+    user_dict.create_table(node.table_name)
 
 
 def execute_show_tables(node):
@@ -38,6 +38,7 @@ def execute_insert(node):
     table = TableFile(data_dict, node.table_name, node.value_list)
     if not table.insert(index_dict):
         print "Error: Types are not matched or index duplicated"
+        return
     index_dict.load_index()
 
 
@@ -47,8 +48,10 @@ def execute_drop_table(node):
         return
     del data_dict.dict[node.table_name]     # remove data dict
     data_dict.write_back()
-    os.remove(TABLES_PATH + node.table_name) # remove table file
+    if os.path.exists(TABLES_PATH + node.table_name):
+        os.remove(TABLES_PATH + node.table_name) # remove table file
     index_dict.drop_table(node.table_name)
+    user_dict.drop_table(node.table_name)
     print "Drop table '%s' successful." % node.table_name
 
 

@@ -23,9 +23,7 @@ class UserDict:
     def create_table(self, table_name):
         for username, power_dict in self.power.items():
             if username != "admin":
-                self.add_power(username, table_name, self.DEFAULT_POWER)
-            else:
-                self.add_power(username, table_name, self.ALL_POWER)
+                self.add_power([username], [table_name], self.DEFAULT_POWER)
         self.write_back()
 
     def drop_table(self, table_name):
@@ -61,6 +59,8 @@ class UserDict:
                 self.__add_power(user_name, table_name, power_list)
 
     def __add_power(self, user_name, table_name, power_list):
+        if not user_name in self.power:
+            self.power[user_name] = {}
         if table_name in self.power[user_name]:
             self.power[user_name][table_name] |= self.__get_mask(power_list)
         else:
@@ -76,14 +76,14 @@ class UserDict:
         self.power[user_name][table_name] &= ~self.__get_mask(power_list)
 
     def show_power(self, user_name):
+        print "Power List:"
         print "Username: " + user_name
-        print "Power list:"
         for table_name, mask in self.power[user_name].items():
             power_list = []
             for pos in range(len(self.ALL_POWER)):
                 if (mask & (1 << pos)) != 0:
                     power_list.append(self.ALL_POWER[pos])
-            print "Table %s: %s" % table_name, str(power_list)
+            print "Table %s: %s." % (table_name, str(power_list))
 
     def __get_power(self, power_mask):
         power_list = []
@@ -110,9 +110,7 @@ class UserDict:
                 username = items[1]
                 self.password[username] = items[2]
             elif items[0] == '$':
-                table_name = items[1]
-                power_list = items[2:-1]
-                self.add_power(username, table_name, power_list)
+                self.add_power([username], [items[1]], items[2:])
         f.close()
         if len(self.password) == 0:
             self.password['admin'] = 'admin'
@@ -122,7 +120,6 @@ class UserDict:
         f = open(self.path, "w")
         for username in self.password.keys():
             f.write("# " + username + " " + self.password[username] + "\n")
-            print self.power
             for table_name, mask in self.power[username].items():
                 f.write("$ " + table_name + " ")
                 for power in self.__get_power(mask): f.write(power + " ")

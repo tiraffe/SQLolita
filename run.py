@@ -16,6 +16,7 @@ def login():
     password = getpass.getpass('Enter password: ')
     if user_dict.check(username, password):
         UserDict.CurrentUser = username
+        user_dict.show_power(username)
         return True
     else:
         return False
