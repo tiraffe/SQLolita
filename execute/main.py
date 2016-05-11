@@ -163,7 +163,7 @@ def execute_update(node):
     print "%d line(s) are updated." % updated_lines
 
 
-def __can_use_index(table_name, where_node, index_dict):
+def __can_use_index(table_name, where_node):
     if where_node.left.type == NodeType.relation_attr and where_node.right.type == NodeType.value \
             and where_node.op == "=" and index_dict.has_index(table_name, where_node.left.attr_name):
         return True
@@ -203,8 +203,7 @@ def execute_select(node):
     try:
         select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
         res = query.joint(table_data)
-        if node.where_list and len(node.from_list) == 1 \
-                and __can_use_index(node.from_list[0], node.where_list, index_dict):
+        if node.where_list and len(node.from_list) == 1 and __can_use_index(node.from_list[0], node.where_list):
             val = node.where_list.right.value
             num = index_dict.query(node.from_list[0], node.where_list.left.attr_name, [val])[0]
             res = [res[num]] if num else []

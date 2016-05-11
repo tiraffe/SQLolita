@@ -84,6 +84,7 @@ def p_power_list(p):
     else:
         p[0] = p[1] + [p[3]]
 
+
 def p_power_type(p):
     """  power_type : SELECT
                     | UPDATE

@@ -7,11 +7,11 @@ from frontend.nodes import NodeType
 class UserDict:
     CurrentUser = "admin"
     ALL_POWER = [NodeType.select, NodeType.update, NodeType.delete, NodeType.insert, NodeType.create_table,
-                 NodeType.drop_table, NodeType.drop_index, NodeType.create_index, NodeType.drop_index,
-                 NodeType.alert, NodeType.create_user, NodeType.print_table]
+                 NodeType.drop_table, NodeType.drop_index, NodeType.create_index, NodeType.alert,
+                 NodeType.create_user, NodeType.print_table]
     DEFAULT_POWER = [NodeType.select, NodeType.print_table]
 
-    def __init__(self, path):
+    def __init__(self, path=USER_PATH):
         self.password = {}  # username, password
         self.power = {}     # username, {table_name, power_mask}
         self.path = path
@@ -31,7 +31,7 @@ class UserDict:
             del self.power[username][table_name]
         self.write_back()
 
-    def has_power(self, user_name, table_list, power_list):
+    def has_power(self, table_list, power_list, user_name=CurrentUser):
         for table_name in table_list:
             for power_type in power_list:
                 if not self.__has_power(user_name, table_name, power_type):
