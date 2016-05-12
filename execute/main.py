@@ -286,6 +286,13 @@ def execute_drop_index(node):
     index_dict.drop_index(node.table_name, node.attr_name)
 
 
+def __check_power(node_type, table_list):
+    if user_dict.has_power(table_list, [node_type]):
+        return True
+    else:
+        pass
+
+
 def execute_create_user(node):
     if node.user_id in user_dict.password.keys():
         print "Error: The username already existed."

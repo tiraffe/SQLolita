@@ -50,7 +50,7 @@ class BPTree:
             return None
 
     def pairs(self):
-        return  self.__pairs(self.root, None)
+        return self.__pairs(self.root, None)
 
     def exist(self, key):
         node = self.search(key)
@@ -64,8 +64,8 @@ class BPTree:
             return [(node.keys[i], node.values[i]) for i in range(len(node.keys))]
         else:
             for u in node.pointers:
-               res += self.__pairs(u, node)
-        return res
+                res += self.__pairs(u, node)
+            return res
 
     def __update_parents(self, node, parent):
         node.parent = parent
@@ -150,22 +150,22 @@ class BPTree:
 
     def __split_leaf(self, node):
         mid_pos = (self.node_size + 1) / 2
-        left_keys = [node.keys[i] for i in range(mid_pos)]
-        left_values = [node.values[i] for i in range(mid_pos)]
+        left_keys = node.keys[:mid_pos]
+        left_values = node.values[:mid_pos]
         left = LeafNode(left_keys, left_values)
-        right_keys = [node.keys[i] for i in range(mid_pos, self.node_size + 1)]
-        right_values = [node.values[i] for i in range(mid_pos, self.node_size + 1)]
+        right_keys = node.keys[mid_pos:]
+        right_values = node.values[mid_pos:]
         right = LeafNode(right_keys, right_values)
         left.parent = right.parent = node.parent
         return left, node.keys[mid_pos], right
 
     def __split_interior(self, node):
         mid_pos = (self.node_size + 1) / 2
-        left_keys = [node.keys[i] for i in range(mid_pos)]
-        left_pointers = [node.pointers[i] for i in range(mid_pos + 1)]
+        left_keys = node.keys[:mid_pos]
+        left_pointers = node.pointers[:mid_pos + 1]
         left = InteriorNode(left_keys, left_pointers)
-        right_keys = [node.keys[i] for i in range(mid_pos + 1, self.node_size + 1)]
-        right_pointers = [node.pointers[i] for i in range(mid_pos + 1, self.node_size + 2)]
+        right_keys = node.keys[mid_pos + 1:]
+        right_pointers = node.pointers[mid_pos + 1:]
         right = InteriorNode(right_keys, right_pointers)
         left.parent = right.parent = node.parent
         for child in left.pointers: child.parent = left
@@ -274,11 +274,11 @@ class BPTree:
 
 
 if __name__ == "__main__":
-    tree = BPTree(4)
+    tree = BPTree(3)
     ok = True
     X = set()
-    for x in range(100):
-        list = [random.randint(0, 100) for i in range(100)]
+    for x in range(10):
+        list = [random.randint(0, 100) for i in range(1000)]
         random.shuffle(list)
         for i in list:
             tree.insert(i, 'x')
