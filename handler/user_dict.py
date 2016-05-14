@@ -31,7 +31,9 @@ class UserDict:
             del self.power[username][table_name]
         self.write_back()
 
-    def has_power(self, table_list, power_list, user_name=CurrentUser):
+    def has_power(self, table_list, power_list, user_name=None):
+        if not user_name:
+            user_name = self.CurrentUser
         for table_name in table_list:
             for power_type in power_list:
                 if not self.__has_power(user_name, table_name, power_type):
@@ -42,10 +44,12 @@ class UserDict:
         if user_name == 'admin':
             return True
         else:
-            assert user_name in self.power and table_name in self.power[user_name]
+            assert user_name in self.power
+            if table_name not in self.power[user_name]:
+                return False
             pos = self.ALL_POWER.index(power_type)
             mask = self.power[user_name][table_name]
-            return (mask & (1 << pos)) == 1
+            return (mask & (1 << pos)) != 0
 
     def create_user(self, username, password, table_names):
         self.password[username] = password

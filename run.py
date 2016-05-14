@@ -23,7 +23,7 @@ def login():
 
 if __name__ == "__main__":
 
-    # while not login(): print "Password or username is not correct!"
+    while not login(): print "Password or username is not correct!"
 
     while True:
         command = raw_input("SQLolita > ")

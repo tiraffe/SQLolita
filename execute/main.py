@@ -19,6 +19,8 @@ user_dict = UserDict(USER_PATH)
 
 
 def execute_create_table(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if data_dict.has_table(node.table_name):
         print "Error: This table already exists."
         return
@@ -32,6 +34,8 @@ def execute_show_tables(node):
 
 
 def execute_insert(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -43,6 +47,8 @@ def execute_insert(node):
 
 
 def execute_drop_table(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -81,6 +87,8 @@ def execute_print_table(node):
 
 
 def execute_alert(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -110,6 +118,8 @@ def execute_alert(node):
 
 
 def execute_delete(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -143,6 +153,8 @@ def set_value(data, names, set_list):
 
 
 def execute_update(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -179,6 +191,8 @@ def __dur(op=None, clock=[time.time()]):
 
 
 def execute_select(node):
+    if not __check_power(node.type, node.from_list):
+        return
     __dur()
     for table_name in node.from_list:
         if not data_dict.has_table(table_name):
@@ -257,6 +271,8 @@ def check_where(where_node, part_names, data_line, full_names = None):
 
 
 def execute_create_index(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -273,6 +289,8 @@ def execute_create_index(node):
 
 
 def execute_drop_index(node):
+    if not __check_power(node.type, [node.table_name]):
+        return
     if not data_dict.has_table(node.table_name):
         print "Error: The table does not exist."
         return
@@ -290,7 +308,8 @@ def __check_power(node_type, table_list):
     if user_dict.has_power(table_list, [node_type]):
         return True
     else:
-        pass
+        print "Error: The user does not have this permission."
+        return False
 
 
 def execute_create_user(node):
