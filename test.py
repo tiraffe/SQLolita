@@ -39,9 +39,8 @@ def exec_sql(sql):
     from execute.main import execute_main
     execute_main(res)
 
-a = [1, 2, 3, 4]
 
-
+# exec_sql(insert_test)
 # exec_sql("drop user tyh password 'tyh';")
 #exec_sql("insert into big values(1, 1), (2 ,2);")
 

@@ -325,6 +325,5 @@ if __name__ == '__main__':
         if not s: continue
         try:
             result = parser.parse(s, lexer=lex)
-            print result
         except Exception, e:
             print(e)

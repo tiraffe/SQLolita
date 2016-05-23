@@ -12,7 +12,7 @@ class NodeType:
     create_table = 'CREATETABLE'
     drop_table = 'DROPTABLE'
     create_index = 'CREATEINDEX'
-    drop_index = 'DROPTABLE'
+    drop_index = 'DROPINDEX'
     create_user = 'CREATEUSER'
     exit = 'EXIT'
     print_table = 'PRINT'

@@ -28,6 +28,7 @@ class UserDict:
 
     def drop_table(self, table_name):
         for username, power_dict in self.power.items():
+            if username == "admin": continue
             del self.power[username][table_name]
         self.write_back()
 

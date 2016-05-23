@@ -175,7 +175,14 @@ def execute_update(node):
     print "%d line(s) are updated." % updated_lines
 
 
-def __can_use_index(table_name, where_node):
+def __dur(op=None, clock=[time.time()]):
+    if op:
+        duration = time.time() - clock[0]
+        print '%s finished. Duration %.6f seconds.' % (op, duration)
+    clock[0] = time.time()
+
+
+def __can_use_index_select(table_name, where_node):
     if where_node.left.type == NodeType.relation_attr and where_node.right.type == NodeType.value \
             and where_node.op == "=" and index_dict.has_index(table_name, where_node.left.attr_name):
         return True
@@ -183,11 +190,12 @@ def __can_use_index(table_name, where_node):
         return False
 
 
-def __dur(op=None, clock=[time.time()]):
-    if op:
-        duration = time.time() - clock[0]
-        print '%s finished. Duration %.6f seconds.' % (op, duration)
-    clock[0] = time.time()
+def __can_use_index_joint(table_name, where_node):
+    if where_node.left.type == NodeType.relation_attr and where_node.right.type == NodeType.relation_attr \
+            and where_node.op == "=" and index_dict.has_index(table_name, where_node.left.attr_name):
+        return True
+    else:
+        return False
 
 
 def execute_select(node):
@@ -216,13 +224,17 @@ def execute_select(node):
         node.select_list = full_name
     try:
         select_col_nums = [name_dict[str(attr_name)] for attr_name in node.select_list]
-        res = query.joint(table_data)
-        if node.where_list and len(node.from_list) == 1 and __can_use_index(node.from_list[0], node.where_list):
+        if node.where_list and len(node.from_list) == 2 and  __can_use_index_joint(node.from_list[0], node.where_list):
+            # print "This query used index."
+            res = query.joint_by_index(table_data, node.from_list[0], node.where_list.left.attr_name, index_dict)
+        else:
+            res = query.joint(table_data)
+        if node.where_list and __can_use_index_select(node.from_list[0], node.where_list):
+            # print "This query used index."
             val = node.where_list.right.value
             num = index_dict.query(node.from_list[0], node.where_list.left.attr_name, [val])[0]
-            res = [res[num]] if num else []
-        else:
-            res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
+            res = [res[num]] if num is not None else []
+        res = [line for line in res if check_where(node.where_list, part_name, line, full_name)]
         res = query.projection(res, select_col_nums)
         print_table(node.select_list, res)
         __dur("Select")
