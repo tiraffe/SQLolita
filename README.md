@@ -1,2 +1,2 @@
 # SQLolita
-A DBMS use PLY to paser.
+A DBMS using PLY to paser.
